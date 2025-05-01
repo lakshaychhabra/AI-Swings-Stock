@@ -4,7 +4,7 @@ from langchain_core.runnables import RunnableLambda
 from technical_analysis.technical_workflow import run_technical_analysis
 from langchain.prompts import ChatPromptTemplate
 import yfinance as yf
-from llm.llm import llm
+from llm.llm import llm, TradeDecision
 
 
 class TradeState(TypedDict):
@@ -16,27 +16,48 @@ class TradeState(TypedDict):
     ticker: str
 
 
+
 def fetch_data(state: TradeState) -> TradeState:
     ticker = state["ticker"]
     periods = ["5m", "15m", "30m", "60m"]
-    result = {"candles": {}, "15m_indicators": {}, "ticker": ticker, "history": state.get("history", [])}
+    result = {"candles": {}, "indicators": {}, "ticker": ticker, "history": state.get("history", [])}
 
     for p in periods:
-        df = yf.download(ticker, interval=p, period="1d")
-        df.columns = [col.lower().replace(" ", "_") for col in df.columns]
-        df = df.drop(columns=['adj_close'], errors='ignore')
+        df = yf.download(ticker, interval=p, period="1d", group_by="column")
+        if df.empty:
+            continue
+
+        df.columns = [
+            col[0].lower().replace(" ", "_") if isinstance(col, tuple) else col.lower().replace(" ", "_")
+            for col in df.columns
+        ]
+        df = df.drop(columns=["adj_close"], errors="ignore")
         result["candles"][p] = df.tail(5).to_dict(orient="records")
 
         if p == "15m":
-            result["15m_indicators"] = run_technical_analysis(df)
+            try:
+                result["indicators"] = run_technical_analysis(df)
+            except Exception as e:
+                print(f"Error running TA: {e}")
+                result["indicators"] = {}
 
     return result
 
+
 prompt = ChatPromptTemplate.from_template("""
-You're a stock trading assistant.
-Given the following market data, decide whether to Buy / Sell / Hold the stock.
+You're a trading assistant. Given the market data, output your decision in **valid JSON**.
+
+Respond ONLY in the following format:
+
+```json
+{{
+  "decision": "Buy" | "Sell" | "Hold",
+  "reason": "<detailed structured explanation>"
+}}
+```
 
 Ticker: {ticker}
+
 Candlestick Data:
 {candles}
 
@@ -45,10 +66,6 @@ Technical Indicators:
 
 Past Decisions:
 {history}
-
-Answer:
-- Decision: <Buy/Sell/Hold>
-- Reason (detailed): <explanation>
 """)
 
 def llm_decision(state: TradeState) -> TradeState:
@@ -58,18 +75,13 @@ def llm_decision(state: TradeState) -> TradeState:
         indicators=state["indicators"],
         history=state.get("history", [])
     ).to_messages()
+    result: TradeDecision = llm.invoke(messages)
 
-    response = llm.invoke(messages)
-    text = response.content.strip()
-
-    if "Buy" in text:
-        decision = "Buy"
-    elif "Sell" in text:
-        decision = "Sell"
-    else:
-        decision = "Hold"
-
-    return {**state, "decision": decision, "reason": text}
+    return {
+        **state,
+        "decision": result.decision,
+        "reason": result.reason,
+    }
 
 # --- 4. Node: Update History ---
 def update_history(state: TradeState) -> TradeState:
