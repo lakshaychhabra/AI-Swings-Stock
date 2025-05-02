@@ -45,27 +45,27 @@ def fetch_data(state: TradeState) -> TradeState:
 
 
 prompt = ChatPromptTemplate.from_template("""
-You're a trading assistant. Given the market data, output your decision in **valid JSON**.
+    You're a trading assistant. Given the market data, output your decision in **valid JSON**.
 
-Respond ONLY in the following format:
+    Respond ONLY in the following format:
 
-```json
-{{
-  "decision": "Buy" | "Sell" | "Hold",
-  "reason": "<detailed structured explanation>"
-}}
-```
+    ```json
+    {{
+    "decision": "Buy" | "Sell" | "Hold",
+    "reason": "<detailed structured explanation>"
+    }}
+    ```
 
-Ticker: {ticker}
+    Ticker: {ticker}
 
-Candlestick Data:
-{candles}
+    Candlestick Data:
+    {candles}
 
-Technical Indicators:
-{indicators}
+    Technical Indicators:
+    {indicators}
 
-Past Decisions:
-{history}
+    Past Decisions:
+    {history}
 """)
 
 def llm_decision(state: TradeState) -> TradeState:
@@ -100,4 +100,4 @@ graph.add_edge("fetch_data", "decide")
 graph.add_edge("decide", "update")
 graph.add_edge("update", END)
 
-app = graph.compile()
+ta_agent = graph.compile()

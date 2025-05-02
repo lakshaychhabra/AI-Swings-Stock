@@ -8,10 +8,9 @@ import plotly.graph_objects as go
 import plotly.utils
 import json
 import yfinance as yf
-from datetime import datetime
-
 from trading.core.trader import Trader
 from trading.services.redis_service import RedisService
+
 
 app = FastAPI(title="Trading API")
 templates = Jinja2Templates(directory="templates")
@@ -297,6 +296,43 @@ async def get_cash_balance():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/analyze")
+def analyze_ticker(request: dict):
+    ticker = request.get("ticker")
+    if not ticker:
+        return {"error": "Missing 'ticker'"}
+
+    today = str(date.today())
+
+    # Load local cache
+    if os.path.exists(NEWS_PATH):
+        with open(NEWS_PATH, "r") as f:
+            news_data = json.load(f)
+    else:
+        news_data = {}
+
+    # Run news agent if ticker missing or outdated
+    if ticker not in news_data or news_data[ticker].get("date") != today:
+        print("📡 Fetching fresh news...")
+        articles = run_news_agent(ticker)
+        news_data[ticker] = {"date": today, "articles": articles}
+
+        with open(NEWS_PATH, "w") as f:
+            json.dump(news_data, f, indent=2)
+    else:
+        articles = news_data[ticker]["articles"]
+
+    news_decision = analyze_news_sentiment(ticker, articles)
+    ta_decision = run_ta_agent(ticker)
+    final_decision = combine_signals(news_decision, ta_decision)
+
+    return {
+        "ticker": ticker,
+        "news_decision": news_decision,
+        "ta_decision": ta_decision,
+        "final_decision": final_decision
+    }
 
 if __name__ == "__main__":
     import uvicorn
