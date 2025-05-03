@@ -1,6 +1,6 @@
-# 🧠 AI Module — AI-Swings-Stocks
+# 🧠 AI Module — AI-Swings-Stock
 
-This folder contains the **core AI system** powering the stock analysis and decision-making logic of [AI-Swings-Stocks](https://github.com/lakshaychhabra/AI-Swings-Stocks).  
+This folder contains the **core AI system** powering the stock analysis and decision-making logic of [AI-Swings-Stock](https://github.com/lakshaychhabra/AI-Swings-Stock).  
 It includes autonomous agents, core trading logic, technical analysis tools, and LLM-based reasoning to analyze stocks for swing trading.
 
 ---
@@ -27,8 +27,8 @@ The AI logic is exposed via Python modules and optionally served via an API in `
 
 ```bash
 # Clone the repo
-git clone https://github.com/lakshaychhabra/AI-Swings-Stocks.git
-cd AI-Swings-Stocks/ai
+git clone https://github.com/lakshaychhabra/AI-Swings-Stock.git
+cd AI-Swings-Stock/ai
 ```
 
 # Install dependencies

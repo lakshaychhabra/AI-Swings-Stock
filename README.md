@@ -1,10 +1,10 @@
-# 📈 AI-Swings-Stocks
+# 📈 AI-Swings-Stock
 
-![GitHub Repo stars](https://img.shields.io/github/stars/lakshaychhabra/AI-Swings-Stocks?style=social)
+![GitHub Repo stars](https://img.shields.io/github/stars/lakshaychhabra/AI-Swings-Stock?style=social)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python Version](https://img.shields.io/badge/python-3.11%2B-blue)
 
-AI-Swings-Stocks is an intelligent stock trading system designed to automate stock selection, perform in-depth AI analysis, and execute buy/sell operations via broker APIs.
+AI-Swings-Stock is an intelligent stock trading system designed to automate stock selection, perform in-depth AI analysis, and execute buy/sell operations via broker APIs.
 
 It is engineered to focus on **swing trading** opportunities using a combination of qualitative, quantitative, sentiment, and risk-based analysis powered by AI agents.
 
