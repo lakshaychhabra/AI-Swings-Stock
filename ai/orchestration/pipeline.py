@@ -1,8 +1,8 @@
-from datetime import datetime, date
 import json, os
-from agents.sentiment_agent import news_agent
-from agents.ta_agent import ta_agent
-from agents.combination_agent import combine_signals
+from datetime import date
+from ai.agents.sentiment_agent import news_agent
+from ai.agents.ta_agent import ta_agent
+from ai.agents.ensemble_agent import combine_signals
 
 NEWS_CACHE = "data/news_cache.json"
 
@@ -27,6 +27,7 @@ def load_news(ticker: str):
         }
         data[ticker] = news_result
 
+        os.makedirs(os.path.dirname(NEWS_CACHE), exist_ok=True)
         with open(NEWS_CACHE, "w") as f:
             json.dump(data, f, indent=2)
 
@@ -41,18 +42,12 @@ def analyse_ticker(request: dict):
         return {"error": "Missing 'ticker'"}
 
     news_result = load_news(ticker)
-    print(news_result)
     ta_decision = get_ta_decision(ticker)
-    print(ta_decision)
     final_decision = combine_signals(news_result, ta_decision)
-    print(final_decision)
 
     return {
         "ticker": ticker,
         "news_decision": news_result,
         "ta_decision": ta_decision,
         "final_decision": final_decision
-    }
-
-if __name__ == "__main__":
-    print(analyse_ticker({"ticker": "AAPL"}))
+    } 

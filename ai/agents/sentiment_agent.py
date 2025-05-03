@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
-from websearch.search_web import search_with_brave, scrape_articles
+from core.websearch.search_web import search_with_brave, scrape_articles
 from langchain.prompts import ChatPromptTemplate
-from llm.llm import llm
+from ai.llm.gemini import llm
 import json, os
 from datetime import date
 from langchain_core.runnables import RunnableLambda

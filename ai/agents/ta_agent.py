@@ -1,10 +1,10 @@
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, List, Optional
 from langchain_core.runnables import RunnableLambda
-from technical_analysis.technical_workflow import run_technical_analysis
+from core.technical_analysis.technical_workflow import run_technical_analysis
 from langchain.prompts import ChatPromptTemplate
 import yfinance as yf
-from llm.llm import llm, TradeDecision
+from ai.llm.gemini import llm, TradeDecision
 from typing import Annotated
 
 
