@@ -1,5 +1,9 @@
 # 📈 AI-Swings-Stocks
 
+![GitHub Repo stars](https://img.shields.io/github/stars/lakshaychhabra/AI-Swings-Stocks?style=social)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Python Version](https://img.shields.io/badge/python-3.11%2B-blue)
+
 AI-Swings-Stocks is an intelligent stock trading system designed to automate stock selection, perform in-depth AI analysis, and execute buy/sell operations via broker APIs.
 
 It is engineered to focus on **swing trading** opportunities using a combination of qualitative, quantitative, sentiment, and risk-based analysis powered by AI agents.
@@ -13,8 +17,6 @@ It is engineered to focus on **swing trading** opportunities using a combination
 - **System Execution (SE)**: Executes buy/sell/hold actions through Zerodha, maintains ledgers, tracks PnL, and generates dashboards with real-time alerts via Telegram.
 
 ---
-
-## 🛠️ Architecture
 
 ## 🛠️ Architecture Flow (ASCII Style)
 ```
@@ -35,7 +37,7 @@ It is engineered to focus on **swing trading** opportunities using a combination
 +-------------------------------------+
             ↓
 +---------------------------+
-|  Execution via Zerodha    |
+|  Execution via Broker     |
 +---------------------------+
             ↓
 +----------------------------+
@@ -45,9 +47,8 @@ It is engineered to focus on **swing trading** opportunities using a combination
 +-----------------------+
 |  Dashboards and Alerts |
 +-----------------------+
-
-
 ```
+
 ---
 
 ## 📚 Components
@@ -78,96 +79,39 @@ It is engineered to focus on **swing trading** opportunities using a combination
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|:---|:---|
-| Backend | Python (FastAPI, Streamlit) |
-| Scheduling | AWS Lambda / Google Cloud Scheduler |
-| Database | PostgreSQL / Redis |
-| Broker API | Zerodha KiteConnect |
-| Alerting | Telegram Bot API |
-| Logging | ElasticSearch or File-based logs |
-| Hosting | Render / Railway / AWS Lightsail |
-
-# Technical Analysis Library
-
-A comprehensive Python library for technical analysis of financial market data. This library provides a collection of technical indicators commonly used in financial markets.
-
-## Installation
-
-```bash
-pip install -r requirements.txt
-```
-
-## Features
-
-The library includes the following categories of technical indicators:
-
-### Volume Indicators
-- Accumulation/Distribution (A/D)
-- On-Balance Volume (OBV)
-- Chaikin Money Flow (CMF)
-- Force Index (FI)
-- Ease of Movement (EoM)
-- Volume Price Trend (VPT)
-
-### Momentum Indicators
-- Relative Strength Index (RSI)
-- Stochastic Oscillator
-- Moving Average Convergence Divergence (MACD)
-- Williams %R
-- Awesome Oscillator (AO)
-- Rate of Change (ROC)
-
-### Trend Indicators
-- Average Directional Movement Index (ADX)
-- Mass Index
-- Triple Exponential Average (TRIX)
-- Vortex Indicator
-
-### Volatility Indicators
-- Bollinger Bands
-- Average True Range (ATR)
-- Donchian Channel
-- Keltner Channel
-
-### Other Indicators
-- Daily Return
-- Daily Log Return
-- Cumulative Return
-
-## Usage Example
-
-```python
-import pandas as pd
-from technical_analysis.momentum import RSIIndicator
-from technical_analysis.volatility import BollingerBands
-
-# Load your data
-df = pd.DataFrame({
-    'Close': [...],  # your close prices
-    'High': [...],   # your high prices
-    'Low': [...],    # your low prices
-    'Volume': [...]  # your volume data
-})
-
-# Calculate RSI
-rsi = RSIIndicator(close=df['Close'])
-df['RSI'] = rsi.rsi()
-
-# Calculate Bollinger Bands
-bb = BollingerBands(close=df['Close'])
-df['BB_middle'] = bb.bollinger_mavg()
-df['BB_upper'] = bb.bollinger_hband()
-df['BB_lower'] = bb.bollinger_lband()
-```
-
-## Requirements
-
-- Python 3.7+
-- NumPy >= 1.20.0
-- Pandas >= 1.3.0
+| Layer         | Technology                          |
+|---------------|-------------------------------------|
+| Backend       | Python, Golang                      |
+| Agents        | Langgraph                           |
+| Database      | MongoDB                             |
+| Broker API    | yfinance / Zerodha KiteConnect      |
+| Alerting      | Telegram Bot API                    |
+| Logging       | File-based logs                     |
+| LLM           | Gemini Free Version                 |
 
 ## License
 
 MIT License
+
+Copyright (c) 2025 Lakshay Chhabra
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
 
