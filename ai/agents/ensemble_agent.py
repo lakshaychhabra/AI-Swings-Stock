@@ -1,9 +1,5 @@
 from langchain.prompts import ChatPromptTemplate
-from llm.llm import llm
-import json, os
-from datetime import date
-from agents.sentiment_agent import news_agent
-
+from ai.llm.gemini import llm
 
     
 combine_prompt = ChatPromptTemplate.from_template("""
