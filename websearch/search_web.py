@@ -25,7 +25,7 @@ def extract_urls(state):
     return {"urls": urls}
 
 
-def scrape_articles(state, config):
+def scrape_articles(state):
     articles = []
     for url in state["urls"]:
         try:

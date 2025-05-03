@@ -1,6 +1,11 @@
 from langchain.prompts import ChatPromptTemplate
 from llm.llm import llm
+import json, os
+from datetime import date
+from agents.sentiment_agent import news_agent
 
+
+    
 combine_prompt = ChatPromptTemplate.from_template("""
 You are a trading advisor. Given the following signals from two agents:
 

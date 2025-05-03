@@ -5,6 +5,7 @@ from technical_analysis.technical_workflow import run_technical_analysis
 from langchain.prompts import ChatPromptTemplate
 import yfinance as yf
 from llm.llm import llm, TradeDecision
+from typing import Annotated
 
 
 class TradeState(TypedDict):
@@ -52,7 +53,8 @@ prompt = ChatPromptTemplate.from_template("""
     ```json
     {{
     "decision": "Buy" | "Sell" | "Hold",
-    "reason": "<detailed structured explanation>"
+    "reason": "<detailed structured explanation>",
+                                          
     }}
     ```
 
@@ -69,19 +71,30 @@ prompt = ChatPromptTemplate.from_template("""
 """)
 
 def llm_decision(state: TradeState) -> TradeState:
-    messages = prompt.format_prompt(
-        ticker=state["ticker"],
-        candles=state["candles"],
-        indicators=state["indicators"],
-        history=state.get("history", [])
-    ).to_messages()
-    result: TradeDecision = llm.invoke(messages)
+    try:
+        messages = prompt.format_prompt(
+            ticker=state["ticker"],
+            candles=state["candles"],
+            indicators=state["indicators"],
+            history=state.get("history", [])
+        ).to_messages()
+        result: TradeDecision = llm.invoke(messages)
 
-    return {
-        **state,
-        "decision": result.decision,
-        "reason": result.reason,
-    }
+        return {
+            **state,
+            "decision": result.decision,
+            "reason": result.reason,
+            "success": True
+        }
+    except Exception as e:
+        print(f"Error running TA Agent: {e}")
+        return {
+            **state,
+            "success": False,
+            "decision": "None",
+            "reason": "Error running TA",
+        }
+
 
 # --- 4. Node: Update History ---
 def update_history(state: TradeState) -> TradeState:
@@ -91,6 +104,7 @@ def update_history(state: TradeState) -> TradeState:
 
 # --- 5. Build LangGraph ---
 graph = StateGraph(TradeState)
+
 graph.add_node("fetch_data", RunnableLambda(fetch_data))
 graph.add_node("decide", RunnableLambda(llm_decision))
 graph.add_node("update", RunnableLambda(update_history))
