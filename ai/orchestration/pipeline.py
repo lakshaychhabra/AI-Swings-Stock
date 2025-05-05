@@ -1,9 +1,12 @@
 import json, os
 from datetime import date
-from ai.agents.sentiment_agent import news_agent
-from ai.agents.ta_agent import ta_agent
-from ai.agents.ensemble_agent import combine_signals
-
+from agents.sentiment_agent import news_agent
+from agents.ta_agent import ta_agent
+from agents.ensemble_agent import combine_signals
+from agents.risk_agent import risk_agent
+from core.technical_analysis.fetch_data import fetch_data
+from core.utils.utlis import clean_ta
+import time
 NEWS_CACHE = "data/news_cache.json"
 
 def load_news(ticker: str):
@@ -33,21 +36,60 @@ def load_news(ticker: str):
 
         return news_result
     
-def get_ta_decision(ticker: str):
-    return ta_agent.invoke({"ticker": ticker})
+def get_ta_decision(technical_data):
+    return ta_agent.invoke(technical_data)
+
+def get_risk_decision(technical_data):
+    return risk_agent.invoke(technical_data)
 
 def analyse_ticker(request: dict):
     ticker = request.get("ticker")
     if not ticker:
         return {"error": "Missing 'ticker'"}
 
-    news_result = load_news(ticker)
-    ta_decision = get_ta_decision(ticker)
-    final_decision = combine_signals(news_result, ta_decision)
+    try:
+        tat = {}
 
-    return {
-        "ticker": ticker,
-        "news_decision": news_result,
-        "ta_decision": ta_decision,
-        "final_decision": final_decision
-    } 
+        t0 = time.time()
+        technical_data = fetch_data({"ticker": ticker})
+        tat["fetch_data"] = round(time.time() - t0, 3)
+
+        print("Running News Agent")
+        t1 = time.time()
+        news_result = load_news(ticker)
+        tat["news_agent"] = round(time.time() - t1, 3)
+
+        print("Running TA Agent")
+        t2 = time.time()
+        ta_decision = get_ta_decision(technical_data)
+        tat["ta_agent"] = round(time.time() - t2, 3)
+
+        print("Running Risk Agent")
+        t3 = time.time()
+        risk_decision = get_risk_decision(technical_data)
+        tat["risk_agent"] = round(time.time() - t3, 3)
+
+        print("Ensembling Signals")
+        t4 = time.time()
+        final_decision = combine_signals(news_result, ta_decision, risk_decision)
+        tat["combine_signals"] = round(time.time() - t4, 3)
+
+        ta_decision_cleaned = clean_ta(ta_decision)
+        tat["TAT"] = round(time.time() - t0, 3)
+
+        details = {
+            "ticker": ticker,
+            "news_decision": news_result,
+            "ta_decision": ta_decision_cleaned,
+            "risk_decision": risk_decision,
+            "final_decision": final_decision,
+        }
+        
+        return json.dumps({
+            "details": details,
+            "tat": tat
+        }, default=str)
+    except Exception as error:
+        print(error)
+        import traceback
+        return {"error": error, "error_details": str(traceback.format_exc())}
