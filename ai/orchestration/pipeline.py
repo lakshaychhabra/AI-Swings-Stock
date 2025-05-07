@@ -64,6 +64,8 @@ def analyse_ticker(request: dict):
         ta_decision = get_ta_decision(technical_data)
         tat["ta_agent"] = round(time.time() - t2, 3)
 
+        print(ta_decision, news_result)
+
         print("Running Risk Agent")
         t3 = time.time()
         risk_decision = get_risk_decision(technical_data)
