@@ -7,7 +7,15 @@ from agents.risk_agent import risk_agent
 from core.technical_analysis.fetch_data import fetch_data
 from core.utils.utlis import clean_ta
 import time
+import requests
+from fastapi.responses import JSONResponse
+from core.utils.utlis import safe_json
+
+session = requests.Session()
+
 NEWS_CACHE = "data/news_cache.json"
+
+cache_ticker_testing = {}
 
 def load_news(ticker: str):
     today = str(date.today())
@@ -51,8 +59,21 @@ def analyse_ticker(request: dict):
         tat = {}
 
         t0 = time.time()
-        technical_data = fetch_data({"ticker": ticker})
+        print("Fetching Technical Data")
+
+        if cache_ticker_testing.get("ticker"):
+            technical_data = cache_ticker_testing.get("ticker")
+            print("Using cached technical data")
+        else:
+            technical_data = fetch_data({"ticker": ticker})
+            cache_ticker_testing[ticker] = technical_data
+            print("Fetched technical data from source")
+
+        if len(technical_data["candles"]) == 0:
+            return {"error": "Failed to fetch technical data"}
+        
         tat["fetch_data"] = round(time.time() - t0, 3)
+        print(technical_data)
 
         print("Running News Agent")
         t1 = time.time()
@@ -85,6 +106,7 @@ def analyse_ticker(request: dict):
             "final_decision": final_decision,
         }
         
+        # return JSONResponse(content=json.loads(safe_json({"details": details, "tat": tat})))
         return json.dumps({
             "details": details,
             "tat": tat

@@ -20,3 +20,4 @@ dotenv
 langchain_community
 lxml_html_clean
 newspaper3k
+KiteConnect

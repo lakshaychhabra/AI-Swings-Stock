@@ -24,3 +24,25 @@ def clean_ta(ta_decision: dict) -> dict:
                 ta_cleaned["indicators"][tf] = floatify_indicators(ta_cleaned["indicators"][tf])
 
     return ta_cleaned
+
+import json
+from datetime import datetime
+from pathlib import Path
+
+def safe_default(o):
+    if isinstance(o, Exception):
+        return {"error": str(o), "type": o.__class__.__name__}
+    if isinstance(o, datetime):
+        return o.isoformat()
+    if isinstance(o, Path):
+        return str(o)
+    if hasattr(o, "__dict__"):
+        return o.__dict__
+    return f"<<non-serializable: {o.__class__.__name__}>>"
+
+def safe_json(data, pretty=False):
+    return json.dumps(
+        data,
+        indent=2 if pretty else None,
+        default=safe_default
+    )
